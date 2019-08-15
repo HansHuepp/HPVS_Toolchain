@@ -1,7 +1,6 @@
 # HyperProtectVirtualServer_Toolchain
 IBM Cloud Toolchain Solution for deploying a demo application on an IBM Hyper Protect Virtual Server or other custom Servers
 
-Welcome to the HPVS_Toolchain wiki!
 
 IBM Cloud Continuous Delivery includes Delivery Pipelines to build, test, and deploy in a repeatable way with minimal human intervention. In a pipeline, sequences of stages retrieve input and run jobs, such as builds, tests, and deployments. The focus of the IBM Delivery Pipeline is to deploy final build on Kubernetes or Cloud Foundry.
 
