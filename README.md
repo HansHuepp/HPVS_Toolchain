@@ -1,10 +1,11 @@
 ## Introduction
 IBM Cloud Continuous Delivery includes Delivery Pipelines to build, test, and deploy in a repeatable way with minimal human intervention. In a pipeline, sequences of stages retrieve input and run jobs, such as builds, tests, and deployments. Usually the IBM Delivery Pipeline is used to deploy builds on Kubernetes or Cloud Foundry.
 
-This Page explains how to deploy with the IBM Delivery Pipelines on custom servers. The following example will demonstrate this by using the demo application AcmeAir. Its code will be automatically integrated, dockerized on a custom build-server, uploaded to a private container registry and deployed on multiple custom servers (in this case the IBM Hyper Protect Virtuel Servers). This will all be done while using only the resources given by a free IBM Cloud Account.
+This documentation explains how to deploy on custom servers using the IBM Delivery Pipeline. The following example will demonstrate this by using the demo application AcmeAir. The code will be automatically integrated, dockerized on a custom build-server, uploaded to a private container registry and deployed on multiple custom servers (in this case the IBM Hyper Protect Virtual Servers). This can all be done using only the resources available in a free IBM Cloud Account.
+
 
 ## Prerequisites 
-To follow this tutorial, you will need the following:
+To complete this tutorial you will need the following:
 
 * A computer to customise the Toolchain running Docker                               (https://docs.docker.com/install/)
 
@@ -16,14 +17,14 @@ To follow this tutorial, you will need the following:
 Around one hour
 
 ## Setting up your Hyper Protect Virtual Servers
-First we create the server needed to deploy our software. Setting up a Hyper Protect Virtual Server is really simple. Just open the Command Line Interface of your computer and generate a SSH-Key-Pair by entering the command ssh-keygen (you might need to install open-ssh bevor doing this). Now you can use the generated Private-Key to create your Hyper Protect Virtual Servers [here](https://cloud.ibm.com/catalog/services/ibm-cloud-hyper-protect-virtual-servers).
+First we create the server needed to deploy our software (on?). Setting up a Hyper Protect Virtual Server is really simple. Just open the Command Line Interface on your computer and generate a SSH-Key-Pair by entering the command ‘ssh-keygen’ (you might need to install open-ssh before doing this). Now you can use the generated Private-Key to create your Hyper Protect Virtual Servers  [here](https://cloud.ibm.com/catalog/services/ibm-cloud-hyper-protect-virtual-servers).
 
 This process is explained in more detail under:
 * https://cloud.ibm.com/docs/services/hp-virtual-servers?topic=hp-virtual-servers-overview
 * https://www.ssh.com/ssh/keygen/#sec-Creating-an-SSH-Key-Pair-for-User-Authentication
 
 ## Enabling SSH Key login for your IBM Delivery Pipeline
-To enable the Toolchain to deploy on custom servers we use a custom docker image running linux, which stores the SSH-Keys. It will be used to send commands onto your server. More on this later.
+To enable the toolchain to deploy on custom servers we use a custom docker image running linux, which stores the SSH-Keys. This will be used to send commands onto your server.  More on this later.
 
 To generate this docker image download the sshimage folder from [this](https://github.com/HansHuepp/HyperProtectVirtualServer_Toolchain) git repository to your desktop.
 Now use Shift+Command+G in Finder (on Mac)or Windows+R on your Desktop (Windows) to open the **Go to Folder** search mask. Enter `~/.ssh/` or `/.ssh/`.
