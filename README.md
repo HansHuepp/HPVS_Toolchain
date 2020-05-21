@@ -1,60 +1,58 @@
+# Deploy software to private Hyper Protect Virtual Servers using IBM toolchain
+Build, test, and deploy on custom servers with the IBM Delivery Pipeline
 ## Introduction
-IBM Cloud Continuous Delivery includes Delivery Pipelines to build, test, and deploy in a repeatable way with minimal human intervention. In a pipeline, sequences of stages retrieve input and run jobs, such as builds, tests, and deployments. Usually the IBM Delivery Pipeline is used to deploy builds on Kubernetes or Cloud Foundry.
+With IBM Cloud Continuous Delivery, you can build, test, deploy, and manage apps with toolchains. IBM Cloud Continuous Delivery includes delivery pipelines, making these tasks automated, which in turn, requires little to no human interference.
 
-This documentation explains how to deploy on custom servers using the IBM Delivery Pipeline. The following example will demonstrate this by using the demo application AcmeAir. The code will be automatically integrated, dockerized on a custom build-server, uploaded to a private container registry and deployed on multiple custom servers (in this case the IBM Hyper Protect Virtual Servers). This can all be done using only the resources available in a free IBM Cloud Account.
+In this tutorial, you’ll learn how to deploy on custom servers using the IBM Delivery Pipeline, which is commonly used to deploy builds on Kubernetes or Cloud Foundry. We’ll be using the demo application [AcmeAir](https://github.com/acmeair/acmeair-nodejs), a Node.js implementation of the Acme Air Sample Application. The code will be automatically integrated, dockerized on a custom-built server, uploaded to a private container registry, and deployed on multiple custom servers (in this case the Cloud IBM Hyper Protect Virtual Servers). The best part is that all of this can be done using resources available through an IBM Cloud account. Let’s get started!
 
 
 ## Prerequisites 
-To complete this tutorial you will need the following:
+To complete this tutorial, you need the following:
 
-* A computer to customise the Toolchain running Docker                               (https://docs.docker.com/install/)
+* A computer to customise the Toolchain running [Docker](https://docs.docker.com/install/)
 
-* A free IBM Cloud Account (https://cloud.ibm.com/login)
+* An [IBM Cloud account](https://cloud.ibm.com/login)
 
-* A configured IBM Cloud Container Registry (https://cloud.ibm.com/kubernetes/registry/main/start)
+* A configured [IBM Cloud Container Registry](https://cloud.ibm.com/kubernetes/registry/main/start)
    
 ## Estimated time
-Around one hour
+Completing this tutorial should take about 1 hour.
 
-## Setting up your Hyper Protect Virtual Servers
-First we create the server needed to deploy our software (on?). Setting up a Hyper Protect Virtual Server is really simple. Just open the Command Line Interface on your computer and generate a SSH-Key-Pair by entering the command ‘ssh-keygen’ (you might need to install open-ssh before doing this). Now you can use the generated Private-Key to create your Hyper Protect Virtual Servers  [here](https://cloud.ibm.com/catalog/services/ibm-cloud-hyper-protect-virtual-servers).
+## Step 1: Set up your Hyper Protect Virtual Server
+To begin, you need to create the server required to deploy your software on the private server. Don’t worry, setting up a Hyper Protect Virtual Server is simple. 
 
-This process is explained in more detail under:
-* https://cloud.ibm.com/docs/services/hp-virtual-servers?topic=hp-virtual-servers-overview
-* https://www.ssh.com/ssh/keygen/#sec-Creating-an-SSH-Key-Pair-for-User-Authentication
+Begin by opening the command line interface (CLI) on your computer and generate an SSH key pair by entering the command `ssh-keygen` and following the instructions. Make sure to remember where you store your SSH keys (you may need to install [OpenSSH](https://www.ssh.com/ssh/openssh/#sec-OpenSSH-Download) before doing this). 
 
-## Enabling SSH Key login for your IBM Delivery Pipeline
-To enable the toolchain to deploy on custom servers we use a custom docker image running linux, which stores the SSH-Keys. This will be used to send commands onto your server.  More on this later.
+Now, use the generated private key to create your Hyper Protect Virtual Server [here](https://cloud.ibm.com/catalog). Try to log in to your server via the terminal to make sure everything is working properly. You can find this process explained in more detail in the [Hyper Protect Virtual Server overview](https://cloud.ibm.com/docs/services/hp-virtual-servers?topic=hp-virtual-servers-overview) as well as in the [SSH documentation](https://www.ssh.com/ssh/keygen/#sec-Creating-an-SSH-Key-Pair-for-User-Authentication).
 
-To generate this docker image download the sshimage folder from [this](https://github.com/HansHuepp/HyperProtectVirtualServer_Toolchain) git repository to your desktop.
-Now use Shift+Command+G in Finder (on Mac)or Windows+R on your Desktop (Windows) to open the **Go to Folder** search mask. Enter `~/.ssh/` or `/.ssh/`.
-A folder should open with three text files called id_rsa, id_rsa.pub and known_hosts inside.
-Copy this three files in the sshimage folder on your desktop.
+## Step 2: Enable an SSH key login for your IBM Delivery Pipeline
+To enable the toolchain to deploy on custom servers, you use a custom docker image running Linux, which stores the SSH keys. This will be used to send commands on to your server. I’ll discuss more on this later.
 
-Open the command line interface and navigate into this folder. Run the command `docker build .`. Docker creates an image with a small linux version and your keys in place. With the command `docker image ls` you should be able to see your newly created image. 
+To generate the docker image, download the sshimage folder from [this](https://github.ibm.com/Hans-Hueppelshaeuser/HyperProtectVirtualServer_Toolchain/tree/master/docs) git repository to your desktop. If you’re using a Mac, use **Shift+Command+G** in Finder to open the Go to Folder search mask. If you’re on a Windows device, you’ll use **Windows+R**.
 
-Next you have to 
-tag (`docker tag <local_image> us.icr.io/<my_namespace>/<my_repo>:<my_tag>`) and 
-upload (`docker push us.icr.io/<my_namespace>/<my_repo>:<my_tag>`) 
-your image to the the IBM Container Registry.
+Enter `~/.ssh/` or enter the path shown on your terminal when you generate your SSH keys. A folder should open with three text files inside named *id_rsa*, *id_rsa.pub* and *known_hosts*. Copy all three files in this folder.
 
-More details: https://cloud.ibm.com/kubernetes/registry/main/start
+Now, open the CLI and navigate to the sshimage folder. Run the command `docker build .`. Docker creates an image with a small Linux version and your keys in place. With the command `docker image ls` you should be able to see your newly created image.
 
-## Creating the Pipeline Part 1
-Go to  https://cloud.ibm.com/devops/ and create a  Cloud Foundry Toolchain.
-Link the Git Repository with the code you want to use and enter an API-Key (if you don't have one you can generate one).
-After creating your Toolchain you should see a dashboard where you can configure multiple elements.
-Klick the field with the label **Delivery Pipeline**.
-You will see the two stages of your Pipeline.
+Next you need to tag `docker tag <local_image> us.icr.io/<my_namespace>/<my_repo>:<my_tag>` and upload `docker push us.icr.io/<my_namespace>/<my_repo>:<my_tag>` to your image to the IBM Container Registry. Check out the [Kubernetes Registry Quick Start guide](https://cloud.ibm.com/login?redirect=%2Fkubernetes%2Fregistry%2Fmain%2Fstart) for more details.
 
-Klick on the gear in the right corner of the **BUILD** Stage, then klick on **Configure Stage**.
-Choose the Custom Docker Image as your **Builder type**. Enter the name of your sshimage form your Cloud Container Registry.
-Now klick on **ADD JOB** and select **Deploy**.
-Choose the Custom Docker Image as your **Builder type**. Enter the name of your sshimage form your Cloud Container Registry.
-Now open the tap **Environment properties**. Add a secure property with the name **DOCKER_USERNAME** and the value **iamapikey**. Add a secure property with the name **DOCKER_PASSWORD** and an API-Key as your value (You can generate one [here](https://cloud.ibm.com/iam/apikeys)). Add a text property with the name **SERVER1** and the IP-Address of your Hyper Protect Server as its value.
 
-The following steps are specific to the nodejs version of [AcmeAir](https://github.com/acmeair/acmeair-nodejs) but it should be easy to alter these steps for different Programms.
-Go back to **Jobs** and open your **Build Stage** and enter the following Codelines in the Build Script window:
+## Step 3: Create the pipeline
+Head over to the [DevOps toolchains page](https://cloud.ibm.com/devops/getting-started?env_id=ibm:yp:eu-de) and create a Cloud Foundry toolchain. Link the git repository with the code you want to use and enter an API-Key (if you don't have one you can generate one).
+
+After creating your toolchain, you should see a dashboard where you can configure multiple elements. Click the field with the label **Delivery Pipeline**. The two stages of your pipeline should now be visible.
+
+Click on the gear in the upper right corner of the **Build Stage** and then click the **Configure Stage** option. Choose the custom Docker image as your builder type and enter the name of your sshimage from your IBM Cloud Container Registry.
+
+Next, click on **Add Job** and select **Deploy**. Choose the custom Docker image as your builder type. Enter the name of your sshimage from your Cloud Container Registry. 
+
+Now open the **Environment properties** tab. Add a secure property with the name **DOCKER_USERNAME** and the value **iamapikey**. Add a second secure property with the name **DOCKER_PASSWORD** and an API key as your value. You can generate an API key [here](https://cloud.ibm.com/iam/apikeys). Finally, add a text property with the name **SERVER1** and the IP address of your Hyper Protect Server as its value.
+
+
+## Step 4: Configure the pipeline
+(Please note that the following steps are specific to the Node.js version of AcmeAir but altering these steps for different programs can be done.) 
+
+Go back to the **Jobs** tab, open your **Build Stage**, and add this to the **Build Script window**:
 
 `ssh -t -t $SERVER_1 'rm -r acmeair-nodejs'`
 
@@ -62,7 +60,7 @@ Go back to **Jobs** and open your **Build Stage** and enter the following Codeli
 
 `ssh -t -t $SERVER_1 'cd acmeair-nodejs && docker build -t acmeair/web .'`
 
-Go back to Jobs and your Deploy Stage and enter the following Codelines in the Build Script window:
+Find the **Jobs** tab once more and open your **Deploy Stage**. Now enter the following in the **Build Script window**:
 
 `ssh -t -t $SERVER_1 'docker login -u iamapikey -p $DOCKER_PASSWORD uk.icr.io'`
 
@@ -70,18 +68,13 @@ Go back to Jobs and your Deploy Stage and enter the following Codelines in the B
 
 `ssh -t -t $SERVER_1 'docker push uk.icr.io/hansdocker/acmeair'`
 
-Now go back to your Toolchain overview and press the play button on your Build Stage to see if your toolchain is working. After it finished you should see the sshimage in form of a docker image in your IBM Container Registry.
+Return to your toolchain overview and press the play button on your Build Stage to see if your toolchain is working. After it’s finished, you should see the AcmeAir Docker Image in the form of a docker image in your IBM Container Registry.
 
-## Creating the Pipeline Part 2
-
-Go back to the overview of your pipeline and klick on the gear in the right corner of the **DEPLOY Stage**, then klick on **Configure Stage**.
-
-Now open the tap **Environment properties**. Add a secure property with the name DOCKER_USERNAME and the value iamapikey. Add a secure property with the name DOCKER_PASSWORD and an API-Key as your value. Add a text property with the name SERVER1 and the IP-Address of your Hyper Protect Server as its value.
-
-Go back to the JOBS tap.
-Remove the **Rolling Deploy** stage. Create four new Deploy Stages and name them Prepare, Deploy, Availability Test and Info. Set all four to use the custom docker image **sshimge**, just like you did in part one. Now we set the code for these four stages.
-
-For **Prepare** enter the following script code:
+Navigate back to the overview of your pipeline and click on the gear in the upper right corner of the **Deploy Stage**. Then, click on **Configure Stage**.
+Open the **Environment properties** tab and add a secure property with the name **DOCKER_USERNAME** and the value **iamapikey**. 
+Add a secure property with the name **DOCKER_PASSWORD** and an API key as your value. Then add a text property with the name **SERVER1** and the IP address of your Hyper Protect Server as its value.
+Return to the **Jobs** tab and remove the **Rolling Deploy** stage. You now need to create four new Deploy Stages and name them *Prepare, Deploy, Availability Test*, and *Info*. Set all four to use the custom Docker image **sshimage**, just like you did in part 1. Now you’re ready to set the code for these four stages.
+For the **Prepare** stage enter:
 
 `ssh -t -t root@$SERVER 'docker stop acmeair_web_001'`
 
@@ -89,7 +82,7 @@ For **Prepare** enter the following script code:
 
 `ssh -t -t root@$SERVER 'docker ps'`
 
-For **Deploy** enter the following script code:
+For the **Deploy** stage enter:
 
 `ssh -t -t root@$SERVER 'docker login -u iamapikey -p $DOCKER_PASSWORD uk.icr.io'`
 
@@ -97,11 +90,11 @@ For **Deploy** enter the following script code:
 
 `ssh -t -t root@$SERVER 'docker run -d -P -p 9080:9080 --name acmeair_web_001 --link mongo_001:mongo uk.icr.io/hansdocker/acmeair'`
 
-For **Availability Test** enter the following script code:
+For the **Availability Test** stage enter:
 
 `#!/bin/bash`
 
-`if curl -ivs  http://$SERVER:9080`
+`if curl -ivs http://$SERVER:9080`
 
 `then echo "Server is UP"`
 
@@ -111,19 +104,17 @@ For **Availability Test** enter the following script code:
 
 `fi`
 
-For **Info** enter the following script code:
+For the **Info** stage enter:
 
 `ssh -t -t root@$SERVER 'docker ps'`
 
 `echo http://$SERVER:9080`
 
-Now go back to your Toolchain overview and press the play button on your Deploy Stage to see if your toolchain works.
+Now return to your toolchain overview and click **play** on your Deploy Stage to see if your toolchain works.
+After your finished, you should be able to click on **Info** in the list of your stages to view your logs. There will be a link to the AcmeAir website running on your Hyper Protect Virtual Server. You can easily add more servers by simply duplicating the Deploy Stage and changing the IP address in the environment properties to your new server.
 
-After it finished you should be able to klick on Info in the list of your stages to see your logs. There will be a link to the AcmeAir website running on your Hyper Protect Virtual Server.
 
-You can easily add more servers by simply duplicating the Deploy Stage and changing the IP address in the Environment properties to your new Server.
+## Summary
+Congratulations! By following this tutorial, you can now use IBM toolchain to connect to various servers by using the SSH connection standard. If you’d like, check out the [IBM Toolchain deploys to Hyper Protect Virtual Servers](https://www.youtube.com/watch?v=CiP9Lvk5480&feature=youtu.be) video that demonstrates the toolchain running and explains the function of the code in more detail.  
+You can also learn more about the IBM Delivery Pipeline and toolchain by visiting the [IBM Cloud documentation](https://cloud.ibm.com/docs/services/ContinuousDelivery?topic=ContinuousDelivery-deliverypipeline_about).
 
-This Video shows the function of the code an the toolchain running: https://www.youtube.com/watch?v=CiP9Lvk5480&feature=youtu.be
-
-## More information
-If you want to know more about the IBM Delivery Pipeline and Toolchain you can find more information [here](https://cloud.ibm.com/docs/services/ContinuousDelivery?topic=ContinuousDelivery-deliverypipeline_about)
